@@ -1,19 +1,51 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div>
+    <h1>Population Data</h1>
+    <select v-model="selectedCountry" @change="fetchPopulationData">
+      <option v-for="country in nation" :key="country.name" :value="country.name">
+        {{ country.name }}
+      </option>
+    </select>
+    <div v-if="populationData">
+      <p>Country: {{ populationData.name }}</p>
+      <p>Population: {{ populationData.population }}</p>
+    </div>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import axios from 'axios';
 
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+  data() {
+    return {
+      selectedCountry: '',
+        nation: [],
+      populationData: null,
+    };
+  },
+  mounted() {
+    this.fetchnation();
+  },
+  methods: {
+    async fetchnation() {
+      try {
+        const response = await axios.get('https://datausa.io/api/data?drilldowns=Nation&measures=Population');
+        this.nation = response.data;
+      } catch (error) {
+        console.error('Error fetching nation:', error);
+      }
+    },
+    async fetchPopulationData() {
+      try {
+        const response = await axios.get(`https://datausa.io/api/data?drilldowns=Nation&measures=Population`);
+        this.populationData = response.data[0];
+      } catch (error) {
+        console.error('Error fetching population data:', error);
+      }
+    },
+  },
+};
 </script>
 
 <style>
